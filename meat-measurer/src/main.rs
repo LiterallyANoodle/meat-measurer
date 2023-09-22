@@ -29,9 +29,18 @@ mod menu {
         ask_question(question)
     }
 
+    pub fn parse_unsigned(word: &str) -> Result<u32, std::num::ParseIntError> {
+        word.parse::<u32>()
+    }
+
+    pub fn parse_float(word: &str) -> Result<f32, std::num::ParseFloatError> {
+        word.parse::<f32>()
+    }
+
 }
 
 mod recipe {
+
     #[derive(Debug)]
     pub struct Ingredient {
         pub name: Box<String>,
@@ -43,9 +52,11 @@ mod recipe {
             Ingredient { name: Box::new(name), percent: Box::new(percent) }
         }
     }
+
 }
 
 fn main() -> io::Result<()> {
+
     let question = "What is your ingredient name?";
     let input = menu::ask_question(&question).unwrap();
     let my_ingredient = recipe::Ingredient::new(input.trim().to_string(), 50f32);
@@ -53,8 +64,17 @@ fn main() -> io::Result<()> {
     println!("Your ingredient is {} with {}%", my_ingredient.name, my_ingredient.percent);
 
     let test_list = vec!["crazy!", "i stay noided", "what the dog doin?"];
-    let list_response = menu::ask_list(test_list, "Are you listening to fucking hyperpop you fucking furry?");
-    println!("You typed {}", list_response?);
+    let list_response = menu::ask_list(test_list, "Are you listening to fucking hyperpop you fucking furry? (type a number)");
+    println!("You typed {}", list_response.as_ref().unwrap());
+    match menu::parse_unsigned(list_response.as_ref().unwrap().as_str().trim()) {
+        Ok(num) => println!("As an unsigned: {:?}", num),
+        Err(_) => println!("Not an unsigned!")
+    }
+    match menu::parse_float(list_response.as_ref().unwrap().as_str().trim()) {
+        Ok(num) => println!("As a float: {:?}", num),
+        Err(_) => println!("Not a float!")
+    }
 
     Ok(())
+
 }
